@@ -17,7 +17,7 @@ router.post("/", async (req, res, next) => {
       // 20210710 Nick Hou
       // Throw an error if sender is not a participant in the conversation
       const conversation = await Conversation.findByPk(conversationId)
-      if((conversationId != conversation.user1Id) && (conversationId != conversation.user2Id)) {
+      if((senderId != conversation.user1Id) && (senderId != conversation.user2Id)) {
         next(err)
       }
 
