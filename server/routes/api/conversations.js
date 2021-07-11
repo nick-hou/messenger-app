@@ -89,10 +89,10 @@ router.post("/", async (req, res, next) => {
     }
 
     const senderId = req.user.id;
-    const { userId, otherUserId } = req.body;
+    const { reader, sender } = req.body;
 
     // find the conversationId between the two users
-    const conversation = await Conversation.findConversation(userId, otherUserId)
+    const conversation = await Conversation.findConversation(reader, sender)
     const conversationId = conversation.id
 
     // find all messages in conversation
@@ -100,14 +100,14 @@ router.post("/", async (req, res, next) => {
 
     // mark messages sent by otherUser as read
     receivedMessages.map(msg => {
-      if(msg.senderId === otherUserId) {
+      if(msg.senderId === sender) {
         msg.readStatus = true;
         msg.save();
       }
     })
 
-    // Front end just needs conversationId to update the store
-    res.json(conversationId)
+    // Front end just a status response
+    return res.sendStatus(200);
   } catch (error) {
     next(error);
   }

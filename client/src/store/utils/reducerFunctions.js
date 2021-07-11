@@ -82,12 +82,34 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-export const readConversationInStore = (state, {userId, otherUserId}) => {
+// Update reader's store
+export const readConversationInStore = (state, {reader, sender}) => {
   return state.map((convo) => {
-    if(convo.otherUser.id === otherUserId) {
+    if(convo.otherUser.id === sender) {
       const convoCopy = {...convo};
       convoCopy.messages = convoCopy.messages.map(msg => {
-        if(msg.senderId === otherUserId) {
+        if(msg.senderId === sender) {
+          const msgCopy = {...msg};
+          msgCopy.readStatus = true;
+          return msgCopy;
+        } else {
+          return msg;
+        }
+      });
+      return convoCopy;
+    } else {
+      return convo;
+    }
+  })
+}
+
+// Update sender's store
+export const readSenderConversationInStore = (state, {reader, sender}) => {
+  return state.map((convo) => {
+    if(convo.otherUser.id === reader) {
+      const convoCopy = {...convo};
+      convoCopy.messages = convoCopy.messages.map(msg => {
+        if(msg.senderId === sender) {
           const msgCopy = {...msg};
           msgCopy.readStatus = true;
           return msgCopy;

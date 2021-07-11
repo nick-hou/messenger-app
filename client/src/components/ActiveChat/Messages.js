@@ -23,10 +23,9 @@ const Messages = (props) => {
 
   // Make post request to read messages every time <messages> is loaded, or a new messages is sent/received
   useEffect(() => {
-    console.log("read messages")
     const reqBody = {
-      userId,
-      otherUserId: otherUser.id,
+      reader: userId,
+      sender: otherUser.id,
     };
     dispatch(readMessages(reqBody));
   }, [messages.length, otherUser, userId, dispatch])

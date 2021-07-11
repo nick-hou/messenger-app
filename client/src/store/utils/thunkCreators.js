@@ -125,8 +125,12 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
 
 export const readMessages = (body) => (dispatch) => {
   try {
+    // Update DB
     axios.post("/api/conversations", body);
-    dispatch(readConversation(body.userId, body.otherUserId))
+    // Update reader's store to hide notifications
+    dispatch(readConversation(body.reader, body.sender))
+    // Update sender's store to show "read" bubble
+    socket.emit("read-convo", body)
   } catch (error) {
     console.error(error);
   }
