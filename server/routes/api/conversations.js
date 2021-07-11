@@ -100,15 +100,14 @@ router.post("/", async (req, res, next) => {
 
     // mark messages sent by otherUser as read
     receivedMessages.map(msg => {
-      console.log(msg)
       if(msg.senderId === otherUserId) {
         msg.readStatus = true;
         msg.save();
       }
     })
 
-    // Front end doesn't need any data, so just send a status to save bandwidth
-    res.sendStatus(200)
+    // Front end just needs conversationId to update the store
+    res.json(conversationId)
   } catch (error) {
     next(error);
   }

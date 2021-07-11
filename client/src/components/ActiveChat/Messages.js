@@ -1,26 +1,35 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
+import { useDispatch } from 'react-redux'
 import { Box } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
 import { readMessages } from "../../store/utils/thunkCreators";
 
 const Messages = (props) => {
+  console.log("loading messages")
+  const dispatch = useDispatch();
+
   const { messages, otherUser, userId } = props;
 
-  // Find last message read by other user. returns undefined if none have been read
-  const lastMessageRead = messages
-    .filter(msg => (msg.senderId===userId && msg.readStatus))
-    .pop();
+  const messageReadStatuses = messages.map(msg => msg.readStatus);
 
-  // Make post request to read messages every time <messages> is loaded
+  const [lastMessageRead, setLastMessageRead] = useState({})
+
   useEffect(() => {
-    console.log("useeffect")
+    setLastMessageRead(messages
+        .filter(msg => (msg.senderId===userId && msg.readStatus))
+        .pop())
+  }, [messageReadStatuses])
+
+  // Make post request to read messages every time <messages> is loaded, or a new messages is sent/received
+  useEffect(() => {
+    console.log("read messages")
     const reqBody = {
       userId,
-      otherUserId: otherUser.id
+      otherUserId: otherUser.id,
     };
-    readMessages(reqBody);
-  }, [messages, otherUser, userId])
+    dispatch(readMessages(reqBody));
+  }, [messages.length, otherUser, userId, dispatch])
 
   return (
     <Box>
