@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Box } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
+import { readMessages } from "../../store/utils/thunkCreators";
 
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
@@ -9,7 +10,17 @@ const Messages = (props) => {
   // Find last message read by other user. returns undefined if none have been read
   const lastMessageRead = messages
     .filter(msg => (msg.senderId===userId && msg.readStatus))
-    .pop()
+    .pop();
+
+  // Make post request to read messages every time <messages> is loaded
+  useEffect(() => {
+    console.log("useeffect")
+    const reqBody = {
+      userId,
+      otherUserId: otherUser.id
+    };
+    readMessages(reqBody);
+  }, [messages, otherUser, userId])
 
   return (
     <Box>

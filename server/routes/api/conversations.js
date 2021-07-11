@@ -81,4 +81,37 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// Since this is the only post to conversations, we just use / as our endpoint. If we make a method to create a conversation we can easily change this endpoint.
+router.post("/", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+
+    const senderId = req.user.id;
+    const { userId, otherUserId } = req.body;
+
+    // find the conversationId between the two users
+    const conversation = await Conversation.findConversation(userId, otherUserId)
+    const conversationId = conversation.id
+
+    // find all messages in conversation
+    const receivedMessages = await Message.findAll({where:{conversationId:conversationId}});
+
+    // mark messages sent by otherUser as read
+    receivedMessages.map(msg => {
+      console.log(msg)
+      if(msg.senderId === otherUserId) {
+        msg.readStatus = true;
+        msg.save();
+      }
+    })
+
+    // Front end doesn't need any data, so just send a status to save bandwidth
+    res.sendStatus(200)
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

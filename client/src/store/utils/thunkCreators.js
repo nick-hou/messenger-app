@@ -121,3 +121,12 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const readMessages = (body) => {
+  try {
+    const {data} = axios.post("/api/conversations", body);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
