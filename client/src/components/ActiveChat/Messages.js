@@ -6,11 +6,10 @@ import moment from "moment";
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
 
-  // Find ID of last message read by other user
+  // Find last message read by other user. returns undefined if none have been read
   const lastMessageRead = messages
     .filter(msg => (msg.senderId===userId && msg.readStatus))
     .pop()
-    .id
 
   return (
     <Box>
@@ -23,7 +22,7 @@ const Messages = (props) => {
             text={message.text}
             time={time}
             otherUserPic={otherUser.photoUrl}
-            isLastRead={message.id===lastMessageRead}
+            isLastRead={lastMessageRead ? message.id===lastMessageRead.id : false}
           />
         ) : (
           <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
