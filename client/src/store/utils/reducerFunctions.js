@@ -6,6 +6,7 @@ export const addMessageToStore = (state, payload) => {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      typing: {user1: false, user2: false},
     };
     newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
@@ -75,6 +76,7 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       newConvo.id = message.conversationId;
       newConvo.messages.push(message);
       newConvo.latestMessageText = message.text;
+      newConvo.typing = {user1: false, user2: false};
       return newConvo;
     } else {
       return convo;
@@ -117,6 +119,18 @@ export const readSenderConversationInStore = (state, {reader, sender}) => {
           return msg;
         }
       });
+      return convoCopy;
+    } else {
+      return convo;
+    }
+  })
+}
+
+export const updateTypingInStore = (state, {conversationId, typing}) => {
+  return state.map((convo) => {
+    if(convo.id === conversationId) {
+      const convoCopy = {...convo};
+      convoCopy.otherUserTyping = typing;
       return convoCopy;
     } else {
       return convo;

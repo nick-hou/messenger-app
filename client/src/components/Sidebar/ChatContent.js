@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     color: "#000",
   },
+  italic: {
+    fontStyle: "italic",
+  },
   notification: {
     height: 20,
     minWidth: 20,
@@ -46,7 +49,7 @@ const ChatContent = (props) => {
   const classes = useStyles();
 
   const { conversation } = props;
-  const { latestMessageText, otherUser } = conversation;
+  const { latestMessageText, otherUser, otherUserTyping } = conversation;
 
   const numUnread = conversation.messages.filter(msg => {
     return (!msg.readStatus && (msg.senderId===otherUser.id))
@@ -58,8 +61,11 @@ const ChatContent = (props) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText + ' ' + (numUnread ? classes.bold : '')}>
-          {latestMessageText}
+        <Typography className={classes.previewText + ' ' + (numUnread ? classes.bold : '') + ' ' + (otherUserTyping ? classes.italic : '')}>
+          {otherUserTyping
+            ? "Typing..."
+            : latestMessageText
+          }
         </Typography>
       </Box>
       <Box className={classes.notification + ' ' + (numUnread ? '' : classes.hidden)}>

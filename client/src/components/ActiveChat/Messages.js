@@ -6,7 +6,6 @@ import moment from "moment";
 import { readMessages } from "../../store/utils/thunkCreators";
 
 const Messages = (props) => {
-  console.log("loading messages")
   const dispatch = useDispatch();
 
   const { messages, otherUser, userId } = props;
@@ -47,6 +46,9 @@ const Messages = (props) => {
           <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
         );
       })}
+      {props.otherUserTyping &&
+        <OtherUserBubble text={'...'} otherUser={otherUser} />
+      }
     </Box>
   );
 };

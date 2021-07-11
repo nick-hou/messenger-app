@@ -1,6 +1,7 @@
 import {
   addNewConvoToStore,
   addOnlineUserToStore,
+  updateTypingInStore,
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
@@ -10,8 +11,9 @@ import {
 
 // ACTIONS
 
-const READ_CONVERSATION = "READ_CONVERSATION"
-const READ_SENDER_CONVERSATION = "READ_SENDER_CONVERSATION"
+const READ_CONVERSATION = "READ_CONVERSATION";
+const READ_SENDER_CONVERSATION = "READ_SENDER_CONVERSATION";
+const UPDATE_TYPING = "UPDATE_TYPING";
 const GET_CONVERSATIONS = "GET_CONVERSATIONS";
 const SET_MESSAGE = "SET_MESSAGE";
 const ADD_ONLINE_USER = "ADD_ONLINE_USER";
@@ -35,6 +37,13 @@ export const readSenderConversation = (reader, sender) => {
   return {
     type: READ_SENDER_CONVERSATION,
     payload: {reader, sender}
+  }
+}
+
+export const updateTyping = (conversationId, typing) => {
+  return {
+    type: UPDATE_TYPING,
+    payload: {conversationId, typing}
   }
 }
 
@@ -95,6 +104,8 @@ const reducer = (state = [], action) => {
       return readConversationInStore(state, action.payload);
     case READ_SENDER_CONVERSATION:
       return readSenderConversationInStore(state, action.payload);
+    case UPDATE_TYPING:
+      return updateTypingInStore(state, action.payload);
     case GET_CONVERSATIONS:
       return action.conversations;
     case SET_MESSAGE:

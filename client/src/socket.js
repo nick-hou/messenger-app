@@ -5,6 +5,7 @@ import {
   removeOfflineUser,
   addOnlineUser,
   readSenderConversation,
+  updateTyping
 } from "./store/conversations";
 
 const socket = io(window.location.origin);
@@ -25,6 +26,10 @@ socket.on("connect", () => {
 
   socket.on("read-convo", (data) => {
     store.dispatch(readSenderConversation(data.reader, data.sender))
+  })
+
+  socket.on("update-typing", (body) => {
+    store.dispatch(updateTyping(body.conversationId, body.typing))
   })
 });
 

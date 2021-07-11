@@ -135,3 +135,8 @@ export const readMessages = (body) => (dispatch) => {
     console.error(error);
   }
 };
+
+export const updateTyping = (body) => (dispatch) => {
+  // only need to update the other user's screen
+  socket.emit("update-typing", body)
+}
