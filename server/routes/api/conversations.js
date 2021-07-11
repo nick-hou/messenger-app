@@ -21,7 +21,7 @@ router.get("/", async (req, res, next) => {
       },
       attributes: ["id"],
       //20210709 Nick Hou
-      //Sorting our messages at the get request is the most efficient method and prevents re-rendering. 
+      //Sorting our messages at the get request is the most efficient method and prevents re-rendering.
       order: [[Message, "createdAt", "ASC"]],
       include: [
         { model: Message, order: ["createdAt", "ASC"] },
@@ -71,7 +71,7 @@ router.get("/", async (req, res, next) => {
       }
 
       // set properties for notification count and latest message preview
-      convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
       conversations[i] = convoJSON;
     }
 

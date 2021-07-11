@@ -24,6 +24,14 @@ const useStyles = makeStyles(() => ({
   bubble: {
     background: "#F4F6FA",
     borderRadius: "10px 10px 0 10px"
+  },
+  readIcon: {
+    height: '16px',
+    width: '16px',
+    borderRadius: '8px',
+  },
+  hidden: {
+    opacity: 0,
   }
 }));
 
@@ -36,6 +44,11 @@ const SenderBubble = (props) => {
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      <img
+        src={props.otherUserPic}
+        className={classes.readIcon + ' ' + (props.lastRead ? '' : classes.hidden)}
+        alt="contact icon"
+      />
     </Box>
   );
 };
