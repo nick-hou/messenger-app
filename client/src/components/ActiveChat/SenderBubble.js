@@ -46,7 +46,7 @@ const SenderBubble = (props) => {
       </Box>
       <img
         src={props.otherUserPic}
-        className={classes.readIcon + ' ' + (props.lastRead ? '' : classes.hidden)}
+        className={classes.readIcon + ' ' + (props.isLastRead ? '' : classes.hidden)}
         alt="contact icon"
       />
     </Box>
