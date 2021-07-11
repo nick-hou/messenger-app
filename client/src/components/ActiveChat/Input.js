@@ -40,10 +40,13 @@ class Input extends Component {
       conversationId: this.props.conversationId,
       sender: this.props.conversationId ? null : this.props.user,
     };
-    await this.props.postMessage(reqBody);
-    this.setState({
-      text: "",
-    });
+    // only send if message has content
+    if(reqBody.text) {
+      await this.props.postMessage(reqBody);
+      this.setState({
+        text: "",
+      });
+    }
   };
 
   render() {
