@@ -48,7 +48,9 @@ const ChatContent = (props) => {
   const { conversation } = props;
   const { latestMessageText, otherUser } = conversation;
 
-  const numUnread = conversation.messages.filter(msg => msg.readStatus === false).length;
+  const numUnread = conversation.messages.filter(msg => {
+    return (!msg.readStatus && (msg.senderId===otherUser.id))
+  }).length;
 
   return (
     <Box className={classes.root}>
