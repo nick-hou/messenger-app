@@ -14,14 +14,13 @@ router.post("/", async (req, res, next) => {
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
 
-      // 20210710 Nick Hou
       // Throw an error if sender is not a participant in the conversation
       const conversation = await Conversation.findByPk(conversationId)
       if((conversationId != conversation.user1Id) && (conversationId != conversation.user2Id)) {
         next(err)
       }
 
-      const message = await Message.create({ senderId, text, conversationId, readStatus: false });
+      const message = await Message.create({ senderId, text, conversationId, isRead: false });
       return res.json({ message, sender });
     }
     // if we don't have conversation id, find a conversation to make sure it doesn't already exist
@@ -44,7 +43,7 @@ router.post("/", async (req, res, next) => {
       senderId,
       text,
       conversationId: conversation.id,
-      readStatus: false,
+      isRead: false,
     });
     res.json({ message, sender });
   } catch (error) {

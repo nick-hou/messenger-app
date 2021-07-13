@@ -52,7 +52,7 @@ const ChatContent = (props) => {
   const { latestMessageText, otherUser, otherUserTyping } = conversation;
 
   const numUnread = conversation.messages.filter(msg => {
-    return (!msg.readStatus && (msg.senderId===otherUser.id))
+    return (!msg.isRead && (msg.senderId===otherUser.id))
   }).length;
 
   return (

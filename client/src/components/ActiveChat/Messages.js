@@ -10,23 +10,19 @@ const Messages = (props) => {
 
   const { messages, otherUser, userId } = props;
 
-  // const messageReadStatuses = messages.map(msg => msg.readStatus);
-
   const [lastMessageRead, setLastMessageRead] = useState({})
 
   useEffect(() => {
     setLastMessageRead(messages
-        .filter(msg => (msg.senderId===userId && msg.readStatus))
+        .filter(msg => (msg.senderId===userId && msg.isRead))
         .pop())
   }, [messages, userId])
 
-  // Make post request to read messages every time <messages> is loaded, or a new messages is sent/received
   useEffect(() => {
-    const reqBody = {
+    dispatch(readMessages({
       reader: userId,
       sender: otherUser.id,
-    };
-    dispatch(readMessages(reqBody));
+    }));
   }, [messages.length, otherUser, userId, dispatch])
 
   return (

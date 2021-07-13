@@ -20,8 +20,6 @@ router.get("/", async (req, res, next) => {
         },
       },
       attributes: ["id"],
-      //20210709 Nick Hou
-      //Sorting our messages at the get request is the most efficient method and prevents re-rendering.
       order: [[Message, "createdAt", "ASC"]],
       include: [
         { model: Message, order: ["createdAt", "ASC"] },
@@ -95,22 +93,17 @@ router.post("/", async (req, res, next) => {
     const senderId = req.user.id;
     const { reader, sender } = req.body;
 
-    // find the conversationId between the two users
     const conversation = await Conversation.findConversation(reader, sender)
-    const conversationId = conversation.id
+    const receivedMessages = await Message.findAll({where:{conversationId:conversation.id}});
 
-    // find all messages in conversation
-    const receivedMessages = await Message.findAll({where:{conversationId:conversationId}});
-
-    // mark messages sent by otherUser as read
     receivedMessages.map(msg => {
       if(msg.senderId === sender) {
-        msg.readStatus = true;
+        msg.isRead = true;
         msg.save();
       }
     })
 
-    // Front end just a status response
+    // Front end doesn't need any data
     return res.sendStatus(200);
   } catch (error) {
     next(error);

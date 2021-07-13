@@ -7,8 +7,8 @@ export const addMessageToStore = (state, payload) => {
       otherUser: sender,
       messages: [message],
       typing: {user1: false, user2: false},
+      latestMessageText: message.text,
     };
-    newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
   }
 
@@ -61,8 +61,7 @@ export const addSearchedUsersToStore = (state, users) => {
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { otherUser: user, messages: [] };
-      newState.push(fakeConvo);
+      newState.push({ otherUser: user, messages: [] });
     }
   });
 
@@ -72,36 +71,40 @@ export const addSearchedUsersToStore = (state, users) => {
 export const addNewConvoToStore = (state, recipientId, message) => {
   return state.map((convo) => {
     if (convo.otherUser.id === recipientId) {
-      const newConvo = { ...convo };
-      newConvo.id = message.conversationId;
-      newConvo.messages.push(message);
-      newConvo.latestMessageText = message.text;
-      newConvo.typing = {user1: false, user2: false};
-      return newConvo;
-    } else {
-      return convo;
+      return {
+        ...convo,
+        id: message.conversationId,
+        messages: [...convo.messages, message],
+        latestMessageText: message.text,
+        otherUserTyping: false,
+      }
     }
+    return convo;
   });
 };
+
+const readMessages = (convo, sender) => {
+  return {
+    ...convo,
+    messages: convo.messages.map(msg => {
+      if(msg.senderId === sender) {
+        return {
+          ...msg,
+          isRead: true,
+        };
+      }
+      return msg;
+    })
+  }
+}
 
 // Update reader's store
 export const readConversationInStore = (state, {reader, sender}) => {
   return state.map((convo) => {
     if(convo.otherUser.id === sender) {
-      const convoCopy = {...convo};
-      convoCopy.messages = convoCopy.messages.map(msg => {
-        if(msg.senderId === sender) {
-          const msgCopy = {...msg};
-          msgCopy.readStatus = true;
-          return msgCopy;
-        } else {
-          return msg;
-        }
-      });
-      return convoCopy;
-    } else {
-      return convo;
+      return readMessages(convo, sender);
     }
+    return convo;
   })
 }
 
@@ -109,31 +112,20 @@ export const readConversationInStore = (state, {reader, sender}) => {
 export const readSenderConversationInStore = (state, {reader, sender}) => {
   return state.map((convo) => {
     if(convo.otherUser.id === reader) {
-      const convoCopy = {...convo};
-      convoCopy.messages = convoCopy.messages.map(msg => {
-        if(msg.senderId === sender) {
-          const msgCopy = {...msg};
-          msgCopy.readStatus = true;
-          return msgCopy;
-        } else {
-          return msg;
-        }
-      });
-      return convoCopy;
-    } else {
-      return convo;
+      return readMessages(convo, sender);
     }
+    return convo;
   })
 }
 
 export const updateTypingInStore = (state, {conversationId, typing}) => {
   return state.map((convo) => {
     if(convo.id === conversationId) {
-      const convoCopy = {...convo};
-      convoCopy.otherUserTyping = typing;
-      return convoCopy;
-    } else {
-      return convo;
+      return {
+        ...convo,
+        otherUserTyping: typing,
+      };
     }
+    return convo;
   })
 }

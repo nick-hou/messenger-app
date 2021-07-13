@@ -33,27 +33,24 @@ class Input extends Component {
     });
   };
 
-  // If state.typing changes, dispatch an update
   componentDidUpdate(prevProps, prevState) {
     if(this.state.typing !== prevState.typing) {
-      const reqBody = {
+      this.props.updateTyping({
         conversationId: this.props.conversationId,
         typing: this.state.typing,
-      };
-      this.props.updateTyping(reqBody);
+      });
     }
   }
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    // add sender user info if posting to a brand new convo, so that the other user will have access to username, profile pic, etc.
+    // add sender user info if posting to a brand new convo
     const reqBody = {
       text: event.target.text.value,
       recipientId: this.props.otherUser.id,
       conversationId: this.props.conversationId,
       sender: this.props.conversationId ? null : this.props.user,
     };
-    // only send if message has content
     if(reqBody.text) {
       await this.props.postMessage(reqBody);
       this.setState({
