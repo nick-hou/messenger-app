@@ -21,7 +21,12 @@ export const addMessageToStore = (state, payload) => {
     } else {
       return convo;
     }
-  });
+  }).sort((a, b) => {
+    const aRecent = Date.parse(a.messages[a.messages.length-1].createdAt);
+    const bRecent = Date.parse(b.messages[b.messages.length-1].createdAt);
+    return (bRecent - aRecent)
+  })
+
 };
 
 export const addOnlineUserToStore = (state, id) => {
