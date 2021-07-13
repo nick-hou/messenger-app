@@ -36,7 +36,7 @@ const Messages = (props) => {
             text={message.text}
             time={time}
             otherUserPic={otherUser.photoUrl}
-            isLastRead={lastMessageRead ? message.id===lastMessageRead.id : false}
+            isLastRead={lastMessageRead?.id===message.id}
           />
         ) : (
           <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />

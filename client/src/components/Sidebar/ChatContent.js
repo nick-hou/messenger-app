@@ -15,15 +15,15 @@ const useStyles = (numUnread, otherUserTyping) => makeStyles((theme) => ({
   },
   previewText: {
     fontSize: 12,
-    color: numUnread ? "#000" : "#9CADC8",
-    fontWeight: numUnread ? "bold" : "",
+    color: numUnread ? theme.palette.important.main : theme.palette.secondary.main,
+    fontWeight: numUnread ? theme.typography.button.fontWeight : "",
     fontStyle: otherUserTyping ? "italic" : "",
     letterSpacing: -0.17,
   },
   notification: {
     height: 20,
     minWidth: 20,
-    padding: "0 6px",
+    padding: theme.spacing(0, 1),
     backgroundColor: "#3F92FF",
     marginRight: 10,
     color: "white",

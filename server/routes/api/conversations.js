@@ -84,7 +84,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Since this is the only post to conversations, we just use / as our endpoint. If we make a method to create a conversation we can easily change this endpoint.
-router.post("/", async (req, res, next) => {
+router.put("/readMessages", async (req, res, next) => {
   try {
     if (!req.user) {
       return res.sendStatus(401);
@@ -104,7 +104,7 @@ router.post("/", async (req, res, next) => {
     })
 
     // Front end doesn't need any data
-    return res.sendStatus(200);
+    return res.sendStatus(204);
   } catch (error) {
     next(error);
   }
