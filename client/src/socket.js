@@ -29,7 +29,7 @@ socket.on("connect", () => {
   })
 
   socket.on("update-typing", (body) => {
-    store.dispatch(updateTyping(body.conversationId, body.typing))
+    store.dispatch(updateTyping(body))
   })
 });
 

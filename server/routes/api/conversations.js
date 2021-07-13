@@ -96,7 +96,7 @@ router.post("/", async (req, res, next) => {
     const conversation = await Conversation.findConversation(reader, sender)
     const receivedMessages = await Message.findAll({where:{conversationId:conversation.id}});
 
-    receivedMessages.map(msg => {
+    receivedMessages.forEach(msg => {
       if(msg.senderId === sender) {
         msg.isRead = true;
         msg.save();

@@ -22,41 +22,40 @@ class Input extends Component {
     super(props);
     this.state = {
       text: "",
-      typing: false,
+      isTyping: false,
     };
   }
 
   handleChange = (event) => {
     this.setState({
       text: event.target.value,
-      typing: (event.target.value ? true : false)
+      isTyping: (event.target.value ? true : false)
     });
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if(this.state.typing !== prevState.typing) {
+    if(this.state.isTyping !== prevState.isTyping) {
       this.props.updateTyping({
         conversationId: this.props.conversationId,
-        typing: this.state.typing,
+        isTyping: this.state.isTyping,
       });
     }
   }
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    // add sender user info if posting to a brand new convo
-    const reqBody = {
-      text: event.target.text.value,
-      recipientId: this.props.otherUser.id,
-      conversationId: this.props.conversationId,
-      sender: this.props.conversationId ? null : this.props.user,
-    };
-    if(reqBody.text) {
-      await this.props.postMessage(reqBody);
-      this.setState({
-        text: "",
-        typing: false,
+    const text = event.target.text.value;
+    if(text) {
+      const {otherUser, conversationId, user} = this.props;
+
+      await this.props.postMessage({
+        text,
+        receipientId: otherUser.id,
+        conversationId,
+        sender: conversationId ? null : user,
       });
+
+      this.setState({text: "", isTyping: false})
     }
   };
 
@@ -91,8 +90,8 @@ const mapDispatchToProps = (dispatch) => {
     postMessage: (message) => {
       dispatch(postMessage(message));
     },
-    updateTyping: (body) => {
-      dispatch(updateTyping(body))
+    updateTyping: ({conversationId, isTyping}) => {
+      dispatch(updateTyping({conversationId, isTyping}))
     }
   };
 };

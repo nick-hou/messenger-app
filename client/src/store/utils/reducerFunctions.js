@@ -118,12 +118,12 @@ export const readSenderConversationInStore = (state, {reader, sender}) => {
   })
 }
 
-export const updateTypingInStore = (state, {conversationId, typing}) => {
+export const updateTypingInStore = (state, {conversationId, isTyping}) => {
   return state.map((convo) => {
     if(convo.id === conversationId) {
       return {
         ...convo,
-        otherUserTyping: typing,
+        otherUserTyping: isTyping,
       };
     }
     return convo;

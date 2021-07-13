@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = (numUnread, otherUserTyping) => makeStyles((theme) => ({
   root: {
     display: "flex",
     justifyContent: "space-between",
@@ -15,15 +15,10 @@ const useStyles = makeStyles((theme) => ({
   },
   previewText: {
     fontSize: 12,
-    color: "#9CADC8",
+    color: numUnread ? "#000" : "#9CADC8",
+    fontWeight: numUnread ? "bold" : "",
+    fontStyle: otherUserTyping ? "italic" : "",
     letterSpacing: -0.17,
-  },
-  bold:{
-    fontWeight: "bold",
-    color: "#000",
-  },
-  italic: {
-    fontStyle: "italic",
   },
   notification: {
     height: 20,
@@ -39,15 +34,11 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-  },
-  hidden: {
-    opacity: 0,
+    opacity: numUnread ? 1 : 0,
   }
 }));
 
 const ChatContent = (props) => {
-  const classes = useStyles();
-
   const { conversation } = props;
   const { latestMessageText, otherUser, otherUserTyping } = conversation;
 
@@ -55,20 +46,22 @@ const ChatContent = (props) => {
     return (!msg.isRead && (msg.senderId===otherUser.id))
   }).length;
 
+  const classes = useStyles(numUnread, otherUserTyping)();
+
   return (
     <Box className={classes.root}>
       <Box>
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText + ' ' + (numUnread ? classes.bold : '') + ' ' + (otherUserTyping ? classes.italic : '')}>
+        <Typography className={classes.previewText}>
           {otherUserTyping
             ? "Typing..."
             : latestMessageText
           }
         </Typography>
       </Box>
-      <Box className={classes.notification + ' ' + (numUnread ? '' : classes.hidden)}>
+      <Box className={classes.notification}>
         {numUnread}
       </Box>
     </Box>
