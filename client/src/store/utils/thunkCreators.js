@@ -93,10 +93,6 @@ const sendMessage = (data, body) => {
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
-
-// 20210709 Nick Hou
-// Since we need to add serialized messages to the Redux store, we have to wait until the POST request finishes and returns the formatted message.
-// To fix this, we just need to make postMessage an async function that awaits saveMessage()
 export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body)

@@ -21,7 +21,6 @@ router.get("/", async (req, res, next) => {
       },
       attributes: ["id"],
 
-      //Sorting our messages at the get request is the most efficient method and prevents re-rendering.
       // Sort messages within each conversation
       order: [[Message, "createdAt", "ASC"]],
       include: [
