@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = (numUnread, otherUserTyping) => makeStyles((theme) => ({
   root: {
     display: "flex",
     justifyContent: "space-between",
@@ -15,12 +15,15 @@ const useStyles = makeStyles((theme) => ({
   },
   previewText: {
     fontSize: 12,
-    color: "#9CADC8",
+    color: numUnread ? theme.palette.important.main : theme.palette.secondary.main,
+    fontWeight: numUnread ? theme.typography.button.fontWeight : "",
+    fontStyle: otherUserTyping ? "italic" : "",
     letterSpacing: -0.17,
   },
   notification: {
     height: 20,
-    width: 20,
+    minWidth: 20,
+    padding: theme.spacing(0, 1),
     backgroundColor: "#3F92FF",
     marginRight: 10,
     color: "white",
@@ -31,14 +34,19 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-  },
+    opacity: numUnread ? 1 : 0,
+  }
 }));
 
 const ChatContent = (props) => {
-  const classes = useStyles();
-
   const { conversation } = props;
-  const { latestMessageText, otherUser } = conversation;
+  const { latestMessageText, otherUser, otherUserTyping } = conversation;
+
+  const numUnread = conversation.messages.filter(msg => {
+    return (!msg.isRead && (msg.senderId===otherUser.id))
+  }).length;
+
+  const classes = useStyles(numUnread, otherUserTyping)();
 
   return (
     <Box className={classes.root}>
@@ -47,8 +55,14 @@ const ChatContent = (props) => {
           {otherUser.username}
         </Typography>
         <Typography className={classes.previewText}>
-          {latestMessageText}
+          {otherUserTyping
+            ? "Typing..."
+            : latestMessageText
+          }
         </Typography>
+      </Box>
+      <Box className={classes.notification}>
+        {numUnread}
       </Box>
     </Box>
   );

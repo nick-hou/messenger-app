@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { FormControl, FilledInput } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import { postMessage } from "../../store/utils/thunkCreators";
+import { postMessage, updateTyping } from "../../store/utils/thunkCreators";
 
 const styles = {
   root: {
@@ -22,28 +22,41 @@ class Input extends Component {
     super(props);
     this.state = {
       text: "",
+      isTyping: false,
     };
   }
 
   handleChange = (event) => {
     this.setState({
       text: event.target.value,
+      isTyping: (event.target.value ? true : false)
     });
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.isTyping !== prevState.isTyping) {
+      this.props.updateTyping({
+        conversationId: this.props.conversationId,
+        isTyping: this.state.isTyping,
+      });
+    }
+  }
+
   handleSubmit = async (event) => {
     event.preventDefault();
-    // add sender user info if posting to a brand new convo, so that the other user will have access to username, profile pic, etc.
-    const reqBody = {
-      text: event.target.text.value,
-      recipientId: this.props.otherUser.id,
-      conversationId: this.props.conversationId,
-      sender: this.props.conversationId ? null : this.props.user,
-    };
-    await this.props.postMessage(reqBody);
-    this.setState({
-      text: "",
-    });
+    const text = event.target.text.value;
+    if(text) {
+      const {otherUser, conversationId, user} = this.props;
+
+      await this.props.postMessage({
+        text,
+        receipientId: otherUser.id,
+        conversationId,
+        sender: conversationId ? null : user,
+      });
+
+      this.setState({text: "", isTyping: false})
+    }
   };
 
   render() {
@@ -77,6 +90,9 @@ const mapDispatchToProps = (dispatch) => {
     postMessage: (message) => {
       dispatch(postMessage(message));
     },
+    updateTyping: ({conversationId, isTyping}) => {
+      dispatch(updateTyping({conversationId, isTyping}))
+    }
   };
 };
 

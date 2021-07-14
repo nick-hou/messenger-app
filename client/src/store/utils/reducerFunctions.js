@@ -6,8 +6,9 @@ export const addMessageToStore = (state, payload) => {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      typing: {user1: false, user2: false},
+      latestMessageText: message.text,
     };
-    newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
   }
 
@@ -63,8 +64,7 @@ export const addSearchedUsersToStore = (state, users) => {
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { otherUser: user, messages: [] };
-      newState.push(fakeConvo);
+      newState.push({ otherUser: user, messages: [] });
     }
   });
 
@@ -74,13 +74,61 @@ export const addSearchedUsersToStore = (state, users) => {
 export const addNewConvoToStore = (state, recipientId, message) => {
   return state.map((convo) => {
     if (convo.otherUser.id === recipientId) {
-      const newConvo = { ...convo };
-      newConvo.id = message.conversationId;
-      newConvo.messages.push(message);
-      newConvo.latestMessageText = message.text;
-      return newConvo;
-    } else {
-      return convo;
+      return {
+        ...convo,
+        id: message.conversationId,
+        messages: [...convo.messages, message],
+        latestMessageText: message.text,
+        otherUserTyping: false,
+      }
     }
+    return convo;
   });
 };
+
+const readMessages = (convo, sender) => {
+  return {
+    ...convo,
+    messages: convo.messages.map(msg => {
+      if(msg.senderId === sender) {
+        return {
+          ...msg,
+          isRead: true,
+        };
+      }
+      return msg;
+    })
+  }
+}
+
+// Update reader's store
+export const readConversationInStore = (state, {reader, sender}) => {
+  return state.map((convo) => {
+    if(convo.otherUser.id === sender) {
+      return readMessages(convo, sender);
+    }
+    return convo;
+  })
+}
+
+// Update sender's store
+export const readSenderConversationInStore = (state, {reader, sender}) => {
+  return state.map((convo) => {
+    if(convo.otherUser.id === reader) {
+      return readMessages(convo, sender);
+    }
+    return convo;
+  })
+}
+
+export const updateTypingInStore = (state, {conversationId, isTyping}) => {
+  return state.map((convo) => {
+    if(convo.id === conversationId) {
+      return {
+        ...convo,
+        otherUserTyping: isTyping,
+      };
+    }
+    return convo;
+  })
+}

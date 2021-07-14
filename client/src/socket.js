@@ -4,6 +4,8 @@ import {
   setNewMessage,
   removeOfflineUser,
   addOnlineUser,
+  readSenderConversation,
+  updateTyping
 } from "./store/conversations";
 
 const socket = io(window.location.origin);
@@ -21,6 +23,14 @@ socket.on("connect", () => {
   socket.on("new-message", (data) => {
     store.dispatch(setNewMessage(data.message, data.sender));
   });
+
+  socket.on("read-convo", (data) => {
+    store.dispatch(readSenderConversation(data.reader, data.sender))
+  })
+
+  socket.on("update-typing", (body) => {
+    store.dispatch(updateTyping(body))
+  })
 });
 
 export default socket;

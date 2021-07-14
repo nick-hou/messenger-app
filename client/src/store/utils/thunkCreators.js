@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  readConversation
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -117,3 +118,21 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const readMessages = (body) => async (dispatch) => {
+  try {
+    // Update DB
+    await axios.put("/api/conversations/readMessages", body);
+    // Update reader's store to hide notifications
+    dispatch(readConversation(body.reader, body.sender))
+    // Update sender's store to show "read" bubble
+    socket.emit("read-convo", body)
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateTyping = (body) => (dispatch) => {
+  // only need to update the other user's screen
+  socket.emit("update-typing", body)
+}
