@@ -33,6 +33,9 @@ const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   socket.on("go-online", (id) => {
+    // private room for 1:1 updates
+    socket.join(id);
+
     if (!onlineUsers.includes(id)) {
       onlineUsers.push(id);
     }
@@ -41,7 +44,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    socket.broadcast.emit("new-message", {
+    socket.to(data.recipientId).emit("new-message", {
       message: data.message,
       sender: data.sender,
     });
@@ -55,12 +58,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("read-convo", (data) => {
-    socket.broadcast.emit("read-convo", data)
+  socket.on("read-convo", (body) => {
+    socket.to(data.recipientId).emit("read-convo", body)
   })
 
   socket.on("update-typing", (body) => {
-    socket.broadcast.emit("update-typing", body)
+    socket.to(data.recipientId).emit("update-typing", body)
   })
 });
 
