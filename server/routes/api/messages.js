@@ -15,7 +15,7 @@ router.post("/", async (req, res, next) => {
     if (conversationId) {
 
       const conversation = await Conversation.findByPk(conversationId)
-      if(conversationId !== conversation.id) {
+      if((conversationId != conversation.user1Id) && (conversationId != conversation.user2Id)) {
         next(err)
       }
 
