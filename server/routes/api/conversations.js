@@ -20,9 +20,9 @@ router.get("/", async (req, res, next) => {
         },
       },
       attributes: ["id"],
-      order: [[Message, "createdAt", "DESC"]],
+      order: [[Message, "createdAt", "ASC"]],
       include: [
-        { model: Message, order: ["createdAt", "DESC"] },
+        { model: Message, order: ["createdAt", "ASC"] },
         {
           model: User,
           as: "user1",
@@ -69,11 +69,42 @@ router.get("/", async (req, res, next) => {
       }
 
       // set properties for notification count and latest message preview
-      convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
+
+      //set a for typing status of other participant, default false
+      convoJSON.otherUserTyping = false;
+
       conversations[i] = convoJSON;
     }
 
     res.json(conversations);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Since this is the only post to conversations, we just use / as our endpoint. If we make a method to create a conversation we can easily change this endpoint.
+router.put("/readMessages", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+
+    const senderId = req.user.id;
+    const { reader, sender } = req.body;
+
+    const conversation = await Conversation.findConversation(reader, sender)
+    const receivedMessages = await Message.findAll({where:{conversationId:conversation.id}});
+
+    receivedMessages.forEach(msg => {
+      if(msg.senderId === sender) {
+        msg.isRead = true;
+        msg.save();
+      }
+    })
+
+    // Front end doesn't need any data
+    return res.sendStatus(204);
   } catch (error) {
     next(error);
   }

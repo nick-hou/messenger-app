@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  readConversation
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -93,9 +94,11 @@ const sendMessage = (data, body) => {
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
-export const postMessage = (body) => (dispatch) => {
+
+// await saveMessage to add serialized message to store
+export const postMessage = (body) => async (dispatch) => {
   try {
-    const data = saveMessage(body);
+    const data = await saveMessage(body)
 
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
@@ -117,3 +120,21 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const readMessages = (body) => async (dispatch) => {
+  try {
+    // Update DB
+    await axios.put("/api/conversations/readMessages", body);
+    // Update reader's store to hide notifications
+    dispatch(readConversation(body.reader, body.sender))
+    // Update sender's store to show "read" bubble
+    socket.emit("read-convo", body)
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateTyping = (body) => (dispatch) => {
+  // only need to update the other user's screen
+  socket.emit("update-typing", body)
+}

@@ -54,6 +54,14 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("remove-offline-user", id);
     }
   });
+
+  socket.on("read-convo", (data) => {
+    socket.broadcast.emit("read-convo", data)
+  })
+
+  socket.on("update-typing", (body) => {
+    socket.broadcast.emit("update-typing", body)
+  })
 });
 
 sessionStore

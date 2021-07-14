@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 
-const useStyles = makeStyles(() => ({
+const useStyles = (isLastRead) => makeStyles(() => ({
   root: {
     display: "flex",
     flexDirection: "column",
@@ -24,11 +24,17 @@ const useStyles = makeStyles(() => ({
   bubble: {
     background: "#F4F6FA",
     borderRadius: "10px 10px 0 10px"
+  },
+  readIcon: {
+    height: '16px',
+    width: '16px',
+    borderRadius: '8px',
+    opacity: isLastRead ? 1 : 0,
   }
 }));
 
 const SenderBubble = (props) => {
-  const classes = useStyles();
+  const classes = useStyles(props.isLastRead)();
   const { time, text } = props;
   return (
     <Box className={classes.root}>
@@ -36,6 +42,11 @@ const SenderBubble = (props) => {
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      <img
+        src={props.otherUserPic}
+        className={classes.readIcon}
+        alt="contact icon"
+      />
     </Box>
   );
 };
