@@ -110,6 +110,7 @@ export const readConversationInStore = (state, {reader, sender}) => {
 
 // Update sender's store
 export const readSenderConversationInStore = (state, {reader, sender}) => {
+  console.log("reade conversation")
   return state.map((convo) => {
     if(convo.otherUser.id === reader) {
       return readMessages(convo, sender);

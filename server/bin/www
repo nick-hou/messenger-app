@@ -59,11 +59,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("read-convo", (body) => {
-    socket.to(data.recipientId).emit("read-convo", body)
+    socket.to(body.sender).emit("read-convo", body)
   })
 
   socket.on("update-typing", (body) => {
-    socket.to(data.recipientId).emit("update-typing", body)
+    socket.to(body.recipientId).emit("update-typing", body)
   })
 });
 

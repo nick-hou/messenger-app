@@ -7,6 +7,7 @@ import {
   readSenderConversation,
   updateTyping
 } from "./store/conversations";
+var CryptoJS = require("crypto-js");
 
 const socket = io(window.location.origin);
 
@@ -21,11 +22,13 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
-    store.dispatch(setNewMessage(data.message, data.sender));
+    const bytes  = CryptoJS.AES.decrypt(data.message, 'secret key 123');
+    const decryptedMessage = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    store.dispatch(setNewMessage(decryptedMessage, data.sender));
   });
 
-  socket.on("read-convo", (data) => {
-    store.dispatch(readSenderConversation(data.reader, data.sender))
+  socket.on("read-convo", (body) => {
+    store.dispatch(readSenderConversation(body))
   })
 
   socket.on("update-typing", (body) => {
