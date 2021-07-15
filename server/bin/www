@@ -2,6 +2,7 @@
 
 /* Sets up the environment variables from your .env file*/
 require("dotenv").config();
+var cryptoJs = require("crypto-js")
 
 /**
  * Module dependencies.
@@ -29,12 +30,17 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces, and sync database.
  */
 
+ const encrypt = id => {
+   // return (id.toString() + 'secret_key')
+   return cryptoJs.AES.encrypt(id.toString(), "").toString();
+ }
+
 const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   socket.on("go-online", (id) => {
     // private room for 1:1 updates
-    socket.join(id);
+    socket.join(encrypt(id));
 
     if (!onlineUsers.includes(id)) {
       onlineUsers.push(id);
@@ -44,7 +50,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    socket.to(data.recipientId).emit("new-message", {
+    socket.to(encrypt(data.recipientId)).emit("new-message", {
       message: data.message,
       sender: data.sender,
     });
@@ -59,11 +65,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("read-convo", (body) => {
-    socket.to(body.sender).emit("read-convo", body)
+    socket.to(encrypt(body.sender)).emit("read-convo", body)
   })
 
   socket.on("update-typing", (body) => {
-    socket.to(body.recipientId).emit("update-typing", body)
+    socket.to(encrypt(body.recipientId)).emit("update-typing", body)
   })
 });
 
