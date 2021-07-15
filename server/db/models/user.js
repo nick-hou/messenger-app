@@ -34,6 +34,10 @@ const User = db.define("user", {
     get() {
       return () => this.getDataValue("salt");
     }
+  },
+  lastUpdate: {
+    type: Sequelize.DATE,
+    allowNull: false,
   }
 });
 
@@ -61,5 +65,12 @@ User.beforeUpdate(setSaltAndPassword);
 User.beforeBulkCreate((users) => {
   users.forEach(setSaltAndPassword);
 });
+
+User.refreshLastUpdate = async (userId) => {
+  const user = await User.findByPk(userId);
+  user.update({
+    lastUpdate: new Date()
+  })
+}
 
 module.exports = User;
