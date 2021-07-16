@@ -3,7 +3,7 @@
 /* Sets up the environment variables from your .env file*/
 require("dotenv").config();
 var cryptoJs = require("crypto-js")
-
+const jwt = require("jsonwebtoken");
 /**
  * Module dependencies.
  */
@@ -36,8 +36,20 @@ const server = http.createServer(app);
  }
 
 const io = require("socket.io")(server);
-
-io.on("connection", (socket) => {
+io
+.use(function(socket, next){
+  if (socket.handshake.query && socket.handshake.query.token){
+    jwt.verify(socket.handshake.query.token, process.env.SESSION_SECRET, function(err, decoded) {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      next();
+    });
+  }
+  else {
+    next(new Error('Authentication error'));
+  }
+})
+.on("connection", (socket) => {
   socket.on("go-online", (id) => {
     // private room for 1:1 updates
     socket.join(encrypt(id));
