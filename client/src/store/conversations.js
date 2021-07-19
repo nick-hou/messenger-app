@@ -33,10 +33,10 @@ export const readConversation = (reader, sender) => {
 }
 
 // Update sender's conversation
-export const readSenderConversation = (reader, sender) => {
+export const readSenderConversation = (body) => {
   return {
     type: READ_SENDER_CONVERSATION,
-    payload: {reader, sender}
+    body,
   }
 }
 
@@ -103,7 +103,7 @@ const reducer = (state = [], action) => {
     case READ_CONVERSATION:
       return readConversationInStore(state, action.payload);
     case READ_SENDER_CONVERSATION:
-      return readSenderConversationInStore(state, action.payload);
+      return readSenderConversationInStore(state, action.body);
     case UPDATE_TYPING:
       return updateTypingInStore(state, action.body);
     case GET_CONVERSATIONS:

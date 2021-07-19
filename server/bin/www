@@ -2,7 +2,8 @@
 
 /* Sets up the environment variables from your .env file*/
 require("dotenv").config();
-
+const CryptoJS = require("crypto-js")
+const jwt = require("jsonwebtoken");
 /**
  * Module dependencies.
  */
@@ -29,10 +30,30 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces, and sync database.
  */
 
-const io = require("socket.io")(server);
+ const encrypt = id => {
+   // return (id.toString() + 'secret_key')
+   return CryptoJS.AES.encrypt(id.toString(), process.env.CRYPTO_KEY).toString();
+ }
 
-io.on("connection", (socket) => {
+const io = require("socket.io")(server);
+io
+.use(function(socket, next){
+  if (socket.handshake.query && socket.handshake.query.token){
+    jwt.verify(socket.handshake.query.token, process.env.SESSION_SECRET, function(err, decoded) {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      next();
+    });
+  }
+  else {
+    next(new Error('Authentication error'));
+  }
+})
+.on("connection", (socket) => {
   socket.on("go-online", (id) => {
+    // private room for 1:1 updates
+    socket.join(encrypt(id));
+
     if (!onlineUsers.includes(id)) {
       onlineUsers.push(id);
     }
@@ -41,7 +62,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    socket.broadcast.emit("new-message", {
+    socket.to(encrypt(data.recipientId)).emit("new-message", {
       message: data.message,
       sender: data.sender,
     });
@@ -55,12 +76,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("read-convo", (data) => {
-    socket.broadcast.emit("read-convo", data)
+  socket.on("read-convo", (body) => {
+    socket.to(encrypt(body.sender)).emit("read-convo", body)
   })
 
   socket.on("update-typing", (body) => {
-    socket.broadcast.emit("update-typing", body)
+    socket.to(encrypt(body.recipientId)).emit("update-typing", body)
   })
 });
 

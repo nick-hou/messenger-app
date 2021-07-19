@@ -37,6 +37,7 @@ class Input extends Component {
     if(this.state.isTyping !== prevState.isTyping) {
       this.props.updateTyping({
         conversationId: this.props.conversationId,
+        recipientId: this.props.otherUser.id,
         isTyping: this.state.isTyping,
       });
     }
@@ -50,7 +51,7 @@ class Input extends Component {
 
       await this.props.postMessage({
         text,
-        receipientId: otherUser.id,
+        recipientId: otherUser.id,
         conversationId,
         sender: conversationId ? null : user,
       });
@@ -90,8 +91,8 @@ const mapDispatchToProps = (dispatch) => {
     postMessage: (message) => {
       dispatch(postMessage(message));
     },
-    updateTyping: ({conversationId, isTyping}) => {
-      dispatch(updateTyping({conversationId, isTyping}))
+    updateTyping: ({conversationId, recipientId, isTyping}) => {
+      dispatch(updateTyping({conversationId, recipientId, isTyping}))
     }
   };
 };
