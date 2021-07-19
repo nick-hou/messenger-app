@@ -3,10 +3,23 @@ const { User, Conversation, Message } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
+const convoCache = {}; //userId: {lastFetch, data}
+const convoMiddleware = async (req, res, next) => {
+  if(!req.user) next();
+  const userId = req.user.id;
+  const user = await User.findByPk(userId);
+  if(convoCache[userId]?.lastFetch > user.lastUpdate) {
+    convoCache[userId].lastFetch = new Date();
+    res.json(convoCache[userId].data);
+  }
+  convoCache[userId] = {lastFetch: new Date(), data: []};
+  return next();
+}
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 // TODO: for scalability, implement lazy loading
-router.get("/", async (req, res, next) => {
+router.get("/", convoMiddleware, async (req, res, next) => {
   try {
     if (!req.user) {
       return res.sendStatus(401);
@@ -82,13 +95,13 @@ router.get("/", async (req, res, next) => {
     //Sort conversations by most recent message timestamp
     conversations.sort((a, b) => (b.messages[b.messages.length-1].createdAt - a.messages[a.messages.length-1].createdAt));
 
+    convoCache[userId].data = conversations;
     res.json(conversations);
   } catch (error) {
     next(error);
   }
 });
 
-// Since this is the only post to conversations, we just use / as our endpoint. If we make a method to create a conversation we can easily change this endpoint.
 router.put("/readMessages", async (req, res, next) => {
   try {
     if (!req.user) {
@@ -107,6 +120,9 @@ router.put("/readMessages", async (req, res, next) => {
         msg.save();
       }
     })
+
+    User.refreshLastUpdate(reader);
+    User.refreshLastUpdate(sender);
 
     // Front end doesn't need any data
     return res.sendStatus(204);

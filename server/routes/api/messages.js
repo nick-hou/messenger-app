@@ -44,6 +44,10 @@ router.post("/", async (req, res, next) => {
       conversationId: conversation.id,
       isRead: false,
     });
+
+    User.refreshLastUpdate(senderId);
+    User.refreshLastUpdate(recipientId);
+
     res.json({ message, sender });
   } catch (error) {
     next(error);
