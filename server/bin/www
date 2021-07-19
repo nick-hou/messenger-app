@@ -2,7 +2,7 @@
 
 /* Sets up the environment variables from your .env file*/
 require("dotenv").config();
-var cryptoJs = require("crypto-js")
+const CryptoJS = require("crypto-js")
 const jwt = require("jsonwebtoken");
 /**
  * Module dependencies.
@@ -32,7 +32,7 @@ const server = http.createServer(app);
 
  const encrypt = id => {
    // return (id.toString() + 'secret_key')
-   return cryptoJs.AES.encrypt(id.toString(), "").toString();
+   return CryptoJS.AES.encrypt(id.toString(), process.env.CRYPTO_KEY).toString();
  }
 
 const io = require("socket.io")(server);

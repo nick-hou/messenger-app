@@ -8,7 +8,7 @@ import {
   readConversation
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
-var CryptoJS = require("crypto-js");
+import CryptoJS from "crypto-js";
 
 axios.interceptors.request.use(async function (config) {
   const token = await localStorage.getItem("messenger-token");
@@ -86,7 +86,7 @@ const saveMessage = async (body) => {
 };
 
 const sendMessage = (data, body) => {
-  const encryptedMessage = CryptoJS.AES.encrypt(JSON.stringify(data.message), 'secret key 123').toString();
+  const encryptedMessage = CryptoJS.AES.encrypt(JSON.stringify(data.message), process.env.CRYPTO_KEY).toString();
   socket.emit("new-message", {
     message: encryptedMessage,
     recipientId: body.recipientId,

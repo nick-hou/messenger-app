@@ -7,7 +7,8 @@ import {
   readSenderConversation,
   updateTyping
 } from "./store/conversations";
-var CryptoJS = require("crypto-js");
+import CryptoJS from "crypto-js";
+require('dotenv').config();
 
 const token = localStorage.getItem("messenger-token");
 const socket = io(window.location.origin, {query:{token}});
@@ -24,7 +25,7 @@ socket.on("connect", () => {
       store.dispatch(removeOfflineUser(id));
     });
     socket.on("new-message", (data) => {
-      const bytes  = CryptoJS.AES.decrypt(data.message, 'secret key 123');
+      const bytes  = CryptoJS.AES.decrypt(data.message, process.env.CRYPTO_KEY);
       const decryptedMessage = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
       store.dispatch(setNewMessage(decryptedMessage, data.sender));
     });
