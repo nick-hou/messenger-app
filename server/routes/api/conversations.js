@@ -7,22 +7,13 @@ const convoCache = {}; //userId: {lastFetch, data}
 const convoMiddleware = async (req, res, next) => {
   if(!req.user) next();
   const userId = req.user.id;
-  if(convoCache[userId]) {
-    const user = await User.findByPk(userId);
-    if(convoCache[userId].lastFetch > user.lastUpdate) {
-      console.log("sending from cache")
-      convoCache[userId].lastFetch = new Date();
-      res.json(convoCache[userId].data)
-    } else {
-      console.log("sending from db")
-      convoCache[userId].lastFetch = new Date();
-      next();
-    }
-  } else {
-    console.log("sending from db")
-    convoCache[userId] = {lastFetch: new Date(), data: []};
-    next();
+  const user = await User.findByPk(userId);
+  if(convoCache[userId]?.lastFetch > user.lastUpdate) {
+    convoCache[userId].lastFetch = new Date();
+    res.json(convoCache[userId].data);
   }
+  convoCache[userId] = {lastFetch: new Date(), data: []};
+  return next();
 }
 
 // get all conversations for a user, include latest message text for preview, and all messages
